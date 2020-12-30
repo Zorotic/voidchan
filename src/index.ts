@@ -1,8 +1,12 @@
 import fastify from "fastify";
+import { 
+	FastifyRequest as Request,
+	FastifyReply as Reply
+} from "fastify";
 
-const app = fastify({ logger: true })
+const app = fastify({ logger: true, trustProxy: true });
 
-app.get("/", async (req, reply) => {
+app.get("/", async (req: Request, reply: Reply) => {
 	return { message: "Hello world" };
 });
 
