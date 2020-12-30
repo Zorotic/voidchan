@@ -3,4 +3,4 @@
 
 
 
-Created with love by Zorotic.
+Created by Zorotic.
