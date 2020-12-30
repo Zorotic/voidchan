@@ -1,0 +1,3 @@
+{
+	"extends": "@ayana/ts/lint"
+}

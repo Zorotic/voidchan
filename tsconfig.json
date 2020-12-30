@@ -1,0 +1,21 @@
+{
+	"compileOnSave": false,
+	"compilerOptions": {
+		"noImplicitAny": false,
+		"moduleResolution": "node",
+		"module": "commonjs",
+		"target": "es2017",
+		"outDir": "./bin",
+		"lib": [
+				"es7"
+		],
+		"sourceMap": false,
+		"removeComments": false,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"resolveJsonModule": true
+	},
+	"include": [
+		"./src"
+	]
+}
