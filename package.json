@@ -1,0 +1,11 @@
+{
+  "name": "voidchan",
+  "version": "1.0.0",
+  "main": "bin/index.js",
+  "author": "Zorotic <zorotic@captchabot.xyz>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^14.14.16",
+    "fastify": "^3.9.2"
+  }
+}
