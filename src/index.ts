@@ -1,19 +1,10 @@
-import fastify from "fastify";
-import { 
-	FastifyRequest as Request,
-	FastifyReply as Reply
-} from "fastify";
+import fastify, { FastifyInstance } from "fastify";
+import { APIService } from './Router';
 
-const app = fastify({ logger: true, trustProxy: true });
+const app: FastifyInstance = fastify({ logger: true, trustProxy: true });
 
-app.get("/", async (req: Request, reply: Reply) => {
-	return { message: "Hello world" };
+const api = new APIService(app, {
+	port: 3000
 });
 
-try {
-	app.listen(3000);
-	app.log.info("Server listening on port 3000");
-} catch (e) {
-	app.log.error(e);
-	process.exit(1);
-};
+api.listen();
