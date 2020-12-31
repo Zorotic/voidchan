@@ -100,7 +100,7 @@ class APIService {
 			files: [
 				{
 					name: `${token}.${mimetype}`,
-					url: `http://localhost:3000/i/${token}`
+					url: `https://${req.header.host}/i/${token}`
 				}
 		]} as FileUploadReply;
 	}
