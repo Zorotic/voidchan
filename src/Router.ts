@@ -30,7 +30,7 @@ class APIService {
 				host: "localhost",
 				port: 5432,
 				username: "postgres",
-				password: "test",
+				password: process.env.POSTGRES_PASSWORD,
 				database: "voidchan",
 				synchronize: true,
 				entities: [
