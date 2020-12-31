@@ -70,6 +70,13 @@ class APIService {
 
 	// This is untyped due to the mimetype support we need.
 	private async handleShareXUpload(req: any, reply: any) {
+
+		if (!req.headers.authorization || req.headers.authorization !== process.env.UPLOAD_SECRET) {
+			reply.status(401);
+			reply.header("Content-Type", "text/plain");
+			return "You are unable to access this endpoint.";
+		}
+
 		const data = await req.file();
 
 		const token = randomString(7, false);
