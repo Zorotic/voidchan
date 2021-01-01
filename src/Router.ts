@@ -1,15 +1,20 @@
-import { 
+import {
 	FastifyInstance,
 	FastifyRequest as Request,
 	FastifyReply as Reply
 } from "fastify";
-import { Connection, createConnection, getRepository, Repository } from "typeorm";
-import { getHeapStatistics } from "v8";
+
+import {
+	Connection,
+	createConnection,
+	getRepository,
+	Repository 
+} from "typeorm";
+
 import { FileEntry, ShortenedURL } from "./entities";
 import { FileUploadReply, ShortenedURLReply } from "./structs";
 import { randomString } from "./util/randomString";
 
-/// Main router for backend endpoints.
 class APIService {
 	private port: number;
 	private db: Connection;
@@ -18,11 +23,9 @@ class APIService {
 
 	public constructor(private app: FastifyInstance, options?: APIServiceOptions) {
 		this.port = options.port || 3000;
-
-		/// Setup our routes here.
-		/// TODO: Refactor endpoint registering to be less trash.
 		this.app.register(require("fastify-multipart"));
 
+		/// Setup our routes here.
 		this.app.post("/api/providers/sharex", this.handleShareXUpload.bind(this));
 		this.app.post("/api/providers/shortener", this.shortenURL.bind(this));
 
@@ -152,9 +155,7 @@ class APIService {
 		const url = await this.urls.findOne({ id });
 
 		if (!url) {
-			reply.header("Content-Type", "text/plain");
-			reply.status(404);
-			return "The wizards have been unable to find what you are looking for!";
+			return reply.callNotFound();
 		}
 
 		// Update stats.
