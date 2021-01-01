@@ -1,3 +1,7 @@
+
+/**
+ * Credits to TannerReynolds (https://github.com/TannerReynolds/ShareX-Upload-Server) for this function.
+ */
 export function randomString(number: number | string, symbols: boolean) {
 	let text = '';
 	let possible: string;

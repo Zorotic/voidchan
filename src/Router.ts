@@ -4,15 +4,16 @@ import {
 	FastifyReply as Reply
 } from "fastify";
 import { Connection, createConnection, getRepository, Repository } from "typeorm";
-import { FileEntry } from "./entities";
+import { FileEntry, ShortenedURL } from "./entities";
 import { FileUploadReply } from "./structs";
-import { randomString } from './util/randomString';
+import { randomString } from "./util/randomString";
 
 /// Main router for backend endpoints.
 class APIService {
 	private port: number;
 	private db: Connection;
 	private files: Repository<FileEntry>;
+	private urls: Repository<ShortenedURL>;
 
 	public constructor(private app: FastifyInstance, options?: APIServiceOptions) {
 		this.port = options.port || 3000;
@@ -23,6 +24,7 @@ class APIService {
 
 		this.app.post("/api/providers/sharex", this.handleShareXUpload.bind(this));
 		this.app.get("/i/:imageId", this.handleGetImage.bind(this));
+		this.app.get("/:id", this.handleShortenedURL.bind(this));
 
 		(async () => {
 			this.db = await createConnection({
@@ -34,11 +36,13 @@ class APIService {
 				database: "voidchan",
 				synchronize: true,
 				entities: [
-					FileEntry
+					FileEntry,
+					ShortenedURL
 				]
 			});
 		})().then(() => {
-			this.files = getRepository<FileEntry>(FileEntry)
+			this.files = getRepository<FileEntry>(FileEntry);
+			this.urls = getRepository<ShortenedURL>(ShortenedURL);
 		});
 	}
 
@@ -50,6 +54,20 @@ class APIService {
 			this.app.log.error(e);
 			process.exit(1);
 		};
+	}
+
+	private async handleShortenedURL(req: Request, reply: Reply) {
+		const id = (req.params as any).id;
+
+		const url = await this.urls.findOne({ id });
+
+		if (!url) {
+			reply.header("Content-Type", "text/plain");
+			reply.status(404);
+			return "The wizzards have been unable to find what you are looking for!";
+		}
+
+		reply.redirect(301, url.destUrl);
 	}
 
 	private async handleGetImage(req: Request, reply: Reply) {

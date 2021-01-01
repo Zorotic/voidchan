@@ -1,4 +1,4 @@
-import {Entity, PrimaryColumn, Column} from "typeorm";
+import { Entity, PrimaryColumn, Column } from "typeorm";
 
 @Entity()
 export class FileEntry {
@@ -11,6 +11,6 @@ export class FileEntry {
 	@Column({ type: "bytea" })
 	buffer: Buffer;
 
-	@Column({ type: 'timestamp' })
+	@Column({ type: "timestamp" })
 	uploadDate: Date;
 }
