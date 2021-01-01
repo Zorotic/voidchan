@@ -5,7 +5,7 @@ import {
 } from "fastify";
 import { Connection, createConnection, getRepository, Repository } from "typeorm";
 import { FileEntry, ShortenedURL } from "./entities";
-import { FileUploadReply } from "./structs";
+import { FileUploadReply, ShortenedURLReply } from "./structs";
 import { randomString } from "./util/randomString";
 
 /// Main router for backend endpoints.
@@ -23,7 +23,11 @@ class APIService {
 		this.app.register(require("fastify-multipart"));
 
 		this.app.post("/api/providers/sharex", this.handleShareXUpload.bind(this));
+		this.app.post("/api/providers/shortener", this.shortenURL.bind(this));
+		
+		/// For uploaded content.
 		this.app.get("/i/:imageId", this.handleGetImage.bind(this));
+		/// For shortened URLs.
 		this.app.get("/:id", this.handleShortenedURL.bind(this));
 
 		(async () => {
@@ -56,6 +60,39 @@ class APIService {
 		};
 	}
 
+	private async shortenURL(req: Request, reply: Reply) {
+		if (!req.headers.authorization || req.headers.authorization !== process.env.UPLOAD_SECRET) {
+			reply.status(401);
+			reply.header("Content-Type", "text/plain");
+			return "You are unable to access this endpoint.";
+		}
+
+		const body = req.body as any;
+
+		if (!body.url) {
+			return {
+				statusCode: 200,
+				error: "Unable to parse body, missing URL property."
+			}
+		}
+
+		const url = body.url;
+		const id = body.slug ? body.slug : randomString(4, false);
+
+		const urlEntity = new ShortenedURL();
+
+		urlEntity.destUrl = url;
+		urlEntity.id = id;
+		urlEntity.redirects = 0;
+
+		await this.urls.save(urlEntity);
+
+		return {
+			shortened: `https://vch.gg/${id}`,
+			url
+		} as ShortenedURLReply;
+	}
+
 	private async handleShortenedURL(req: Request, reply: Reply) {
 		const id = (req.params as any).id;
 
@@ -64,7 +101,7 @@ class APIService {
 		if (!url) {
 			reply.header("Content-Type", "text/plain");
 			reply.status(404);
-			return "The wizzards have been unable to find what you are looking for!";
+			return "The wizards have been unable to find what you are looking for!";
 		}
 
 		reply.redirect(301, url.destUrl);
