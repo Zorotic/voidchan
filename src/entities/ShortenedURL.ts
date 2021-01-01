@@ -5,7 +5,7 @@ export class ShortenedURL {
 	@PrimaryColumn()
 	id: string;
 
-	@Column()
+	@Column({ default: 0 })
 	redirects: number;
 
 	@Column()

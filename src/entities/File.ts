@@ -1,3 +1,4 @@
+import { cpuUsage } from "process";
 import { Entity, PrimaryColumn, Column } from "typeorm";
 
 @Entity()
@@ -13,4 +14,7 @@ export class FileEntry {
 
 	@Column({ type: "timestamp" })
 	uploadDate: Date;
+
+	@Column({ default: 0 })
+	views: number;
 }
