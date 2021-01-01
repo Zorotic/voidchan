@@ -155,8 +155,7 @@ class APIService {
 			files: [
 				{
 					name: `${token}.${mimetype}`,
-					/// TODO: Fix this to not assume the domain.
-					url: `https://cdn.voidchan.gg/i/${token}`
+					url: `${req.protocol}://${req.hostname}/i/${token}`
 				}
 		]} as FileUploadReply;
 	}
