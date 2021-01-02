@@ -34,7 +34,7 @@ class APIService {
 		this.app.get("/api/providers/sharex/:id", this.viewShareXUpload.bind(this));
 
 		/// For uploaded content.
-		this.app.get("/i/:id", this.handleGetImage.bind(this));
+		this.app.get("/u/:id", this.handleGetImage.bind(this));
 
 		/// For shortened URLs.
 		this.app.get("/:id", this.handleShortenedURL.bind(this));
@@ -186,7 +186,6 @@ class APIService {
 
 	/// This is untyped due to the mimetype support we need.
 	private async handleShareXUpload(req: any, reply: any) {
-
 		if (!req.headers.authorization || req.headers.authorization !== process.env.UPLOAD_SECRET) {
 			reply.status(401);
 			reply.header("Content-Type", "text/plain");
