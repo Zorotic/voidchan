@@ -209,6 +209,7 @@ class APIService {
 
 		reply.header("Content-Type", "application/json");
 
+		/// TODO: If the file isn't an image. make sure to append the mimetype to the end of 'url'
 		return {
 			statusCode: 200,
 			files: [
