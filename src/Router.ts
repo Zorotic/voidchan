@@ -214,7 +214,7 @@ class APIService {
 			files: [
 				{
 					name: `${token}.${mimetype}`,
-					url: `${req.protocol}://${req.hostname}/i/${token}`
+					url: `${req.protocol}://${req.hostname}/u/${token}`
 				}
 		]} as FileUploadReply;
 	}
