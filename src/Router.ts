@@ -15,6 +15,8 @@ import { FileEntry, ShortenedURL } from "./entities";
 import { FileUploadReply, ShortenedURLReply } from "./structs";
 import { randomString } from "./util/randomString";
 
+import * as mime from "mime";
+
 class APIService {
 	private port: number;
 	private db: Connection;
@@ -159,7 +161,7 @@ class APIService {
 		}
 
 		// Update stats.
-		await this.urls.update({ id }, { redirects: url.redirects + 1});
+		await this.urls.update({ id }, { redirects: url.redirects + 1 });
 
 		reply.redirect(301, url.destUrl);
 	}
@@ -167,7 +169,7 @@ class APIService {
 	private async handleGetImage(req: Request, reply: Reply) {
 		const id = (req.params as any).id;
 
-		const file = await this.files.findOne({ id });
+		const file = await this.files.findOne({ id: id.split('.')[0] });
 		if (!file) {
 			reply.header("Content-Type", "text/plain");
 			reply.status(404);
@@ -175,7 +177,7 @@ class APIService {
 		}
 
 		// Update stats.
-		await this.files.update({ id }, { views: file.views + 1});
+		await this.files.update({ id: id.split('.')[0] }, { views: file.views + 1 });
 
 
 		reply.header("Content-Type", file.mimetype);
@@ -195,7 +197,7 @@ class APIService {
 		const data = await req.file();
 
 		const token = randomString(7, false);
-		const mimetype = data.mimetype.split("/")[1];
+		const mimetype = mime.getExtension(data.mimetype);
 		const fileBuffer = await data.toBuffer();
 
 		const file = new FileEntry();
@@ -209,13 +211,12 @@ class APIService {
 
 		reply.header("Content-Type", "application/json");
 
-		/// TODO: If the file isn't an image. make sure to append the mimetype to the end of 'url'
 		return {
 			statusCode: 200,
 			files: [
 				{
 					name: `${token}.${mimetype}`,
-					url: `${req.protocol}://${req.hostname}/u/${token}`
+					url: `${req.protocol}://${req.hostname}/u/${token}.${mimetype}`
 				}
 		]} as FileUploadReply;
 	}
