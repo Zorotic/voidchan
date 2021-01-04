@@ -16,12 +16,14 @@ import { FileUploadReply, ShortenedURLReply } from "./structs";
 import { randomString } from "./util/randomString";
 
 import * as mime from "mime";
+import * as redis from "ioredis";
 
 class APIService {
 	private port: number;
 	private db: Connection;
 	private files: Repository<FileEntry>;
 	private urls: Repository<ShortenedURL>;
+	private redis: redis.Redis = new redis(); // TODO: Parse login information.
 
 	public constructor(private app: FastifyInstance, options?: APIServiceOptions) {
 		this.port = options.port || 3000;
@@ -36,7 +38,7 @@ class APIService {
 		this.app.get("/api/providers/sharex/:id", this.viewShareXUpload.bind(this));
 
 		/// For uploaded content.
-		this.app.get("/u/:id", this.handleGetImage.bind(this));
+		this.app.get("/u/:id", this.handleGetFile.bind(this));
 
 		/// For shortened URLs.
 		this.app.get("/:id", this.handleShortenedURL.bind(this));
@@ -103,6 +105,7 @@ class APIService {
 		const id = (req.params as any).id;
 
 		const image = await this.files.findOne({ id });
+		
 		if (!image) {
 			reply.header("Content-Type", "text/plain");
 			reply.status(404);
@@ -161,15 +164,15 @@ class APIService {
 		}
 
 		// Update stats.
-		await this.urls.update({ id }, { redirects: url.redirects + 1 });
+		await this.urls.increment({ id }, 'redirects', 1);
 
 		reply.redirect(301, url.destUrl);
 	}
 
-	private async handleGetImage(req: Request, reply: Reply) {
+	private async handleGetFile(req: Request, reply: Reply) {
 		const id = (req.params as any).id;
+		const file = await this.getFile(id)
 
-		const file = await this.files.findOne({ id: id.split('.')[0] });
 		if (!file) {
 			reply.header("Content-Type", "text/plain");
 			reply.status(404);
@@ -177,12 +180,13 @@ class APIService {
 		}
 
 		// Update stats.
-		await this.files.update({ id: id.split('.')[0] }, { views: file.views + 1 });
+		await this.files.increment({ id }, 'views', 1);
 
 
-		reply.header("Content-Type", file.mimetype);
+		const mimetype = mime.getType(id.split(".")[1]);
+		reply.header("Content-Type", mimetype);
 
-		return file.buffer;
+		return file;
 	}
 
 
@@ -202,12 +206,16 @@ class APIService {
 
 		const file = new FileEntry();
 
+		const id = `${token}.${mimetype}`;
+
 		file.id = token;
 		file.mimetype = data.mimetype;
 		file.uploadDate = new Date();
 		file.buffer = fileBuffer;
 
 		await this.files.save(file);
+		await this.cacheFile(id, fileBuffer);
+		this.app.log.info(`Cached file ${id.split(".")[0]}`);
 
 		reply.header("Content-Type", "application/json");
 
@@ -216,9 +224,27 @@ class APIService {
 			files: [
 				{
 					name: `${token}.${mimetype}`,
-					url: `${req.protocol}://${req.hostname}/u/${token}.${mimetype}`
+					url: `${req.protocol}://${req.hostname}/u/${id}`
 				}
 		]} as FileUploadReply;
+	}
+
+	private async getFile(id: string): Promise<Buffer> {
+		const image = await this.redis.getBuffer(id);
+		if (!image) {
+			const fetchedImage = await this.files.findOne({ id: id.split(".")[0] }) as FileEntry;
+
+			await this.redis.set(id, fetchedImage.buffer, "EX", 3600);
+			this.app.log.info(`Cached file ${id.split(".")[0]}`);
+
+			return fetchedImage.buffer;
+		}
+
+		return image;
+	}
+
+	private cacheFile(id: string, buffer: Buffer) {
+		return this.redis.set(id, buffer, "EX", 3600);
 	}
 }
 
