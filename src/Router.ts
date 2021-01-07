@@ -163,10 +163,10 @@ class APIService {
 			return reply.callNotFound();
 		}
 
+		reply.redirect(301, url.destUrl);
+
 		// Update stats.
 		await this.urls.increment({ id }, 'redirects', 1);
-
-		reply.redirect(301, url.destUrl);
 	}
 
 	private async handleGetFile(req: Request, reply: Reply) {
@@ -179,14 +179,13 @@ class APIService {
 			return "Image not found!";
 		}
 
-		// Update stats.
-		await this.files.increment({ id }, 'views', 1);
-
-
 		const mimetype = mime.getType(id.split(".")[1]);
 		reply.header("Content-Type", mimetype);
 
-		return file;
+		reply.send(file);
+
+		// Update stats.
+		await this.files.increment({ id }, 'views', 1);
 	}
 
 
