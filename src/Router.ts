@@ -183,9 +183,6 @@ class APIService {
 		reply.header("Content-Type", mimetype);
 
 		reply.send(file);
-
-		// Update stats.
-		await this.files.increment({ id }, 'views', 1);
 	}
 
 
