@@ -149,7 +149,7 @@ class APIService {
 		await this.urls.save(urlEntity);
 
 		return {
-			shortened: `https://vch.gg/${id}`,
+			shortened: `https://${process.env.SHORT_HOSTNAME}/${id}`,
 			url
 		} as ShortenedURLReply;
 	}
