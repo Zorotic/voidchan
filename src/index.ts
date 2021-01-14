@@ -6,7 +6,7 @@ require('dotenv').config();
 const app: FastifyInstance = fastify({ logger: true, trustProxy: true });
 
 const api = new APIService(app, {
-	port: 3000
+	port: process.env.PORT
 });
 
 api.listen();
