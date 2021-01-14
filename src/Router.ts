@@ -26,7 +26,7 @@ class APIService {
 	private redis: redis.Redis = new redis(); // TODO: Parse login information.
 
 	public constructor(private app: FastifyInstance, options?: APIServiceOptions) {
-		this.port = options.port || 3000;
+		this.port = options.port || process.env.PORT;
 		this.app.register(require("fastify-multipart"));
 
 		/// Setup our routes here.
