@@ -1,12 +1,26 @@
 import fastify, { FastifyInstance } from "fastify";
-import { APIService } from './Router';
+import { Logger } from "@ayanaware/logger";
+import { APIService } from "./Router";
+import { Client } from "./structs/DiscordClient";
 
-require('dotenv').config();
+require("dotenv").config();
 
-const app: FastifyInstance = fastify({ logger: true, trustProxy: true });
+process.chdir(__dirname);
 
-const api = new APIService(app, {
-	port: process.env.PORT
+const app: FastifyInstance = fastify({ logger: false, trustProxy: true });
+
+const logger = Logger.get("Router");
+
+app.addHook("onRequest", (req, res, next) => {
+	logger.info(`(ID: ${req.id}) ${req.routerMethod} -> ${req.url} from ${req.ip}`);
+	next();
 });
 
+const api = new APIService(app, {
+	port: parseInt(process.env.PORT)
+});
+
+const client = new Client(api);
+
 api.listen();
+client.init();
