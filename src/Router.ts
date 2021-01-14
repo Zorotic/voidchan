@@ -14,19 +14,22 @@ import {
 import { FileEntry, ShortenedURL } from "./entities";
 import { FileUploadReply, ShortenedURLReply } from "./structs";
 import { randomString } from "./util/randomString";
+import { Logger } from "@ayanaware/logger";
 
 import * as mime from "mime";
 import * as redis from "ioredis";
 
-class APIService {
-	private port: number;
-	private db: Connection;
-	private files: Repository<FileEntry>;
-	private urls: Repository<ShortenedURL>;
-	private redis: redis.Redis = new redis(); // TODO: Parse login information.
+const logger = Logger.get();
 
-	public constructor(private app: FastifyInstance, options?: APIServiceOptions) {
-		this.port = options.port || process.env.PORT;
+class APIService {
+	public port: number;
+	public db: Connection;
+	public files: Repository<FileEntry>;
+	public urls: Repository<ShortenedURL>;
+	public redis: redis.Redis = new redis(); // TODO: Parse login information.
+
+	public constructor(public app: FastifyInstance, options?: APIServiceOptions) {
+		this.port = options.port || parseInt(process.env.PORT);
 		this.app.register(require("fastify-multipart"));
 
 		/// Setup our routes here.
@@ -66,7 +69,7 @@ class APIService {
 	public listen() {
 		try {
 			this.app.listen(this.port);
-			this.app.log.info(`Server listening on port ${this.port}`);
+			logger.info(`Server listening on port ${this.port}`);
 		} catch (e) {
 			this.app.log.error(e);
 			process.exit(1);
@@ -231,7 +234,7 @@ class APIService {
 			const fetchedImage = await this.files.findOne({ id: id.split(".")[0] }) as FileEntry;
 
 			await this.redis.set(id, fetchedImage.buffer, "EX", 3600);
-			this.app.log.info(`Cached file ${id.split(".")[0]}`);
+			logger.info(`Cached file ${id.split(".")[0]}`);
 
 			return fetchedImage.buffer;
 		}
