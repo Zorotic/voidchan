@@ -27,10 +27,16 @@ export default class PingCommand extends Command {
 		const extension = mime.getExtension(file.mimetype);
 		const embed = new MessageEmbed()
 			.setColor(message.guild.me.displayColor)
-			.setImage(`attachment://file.${extension}`)
 			.setTimestamp(file.uploadDate)
-			.setFooter(`Views: ${file.views}`);
+			.setFooter(`Views: ${file.views}`)
+			.setAuthor(message.member.displayName, message.author.displayAvatarURL({ size: 2048 }));
 
-		return message.channel.send({ embed: embed, files: [{ attachment: file.buffer, name: `file.${extension}` }] })
+		if (extension === "txt") {
+			embed.setDescription(`You can view the file via the attached link.\nhttp://${process.env.HOSTNAME}/u/${file.id}`);
+			return message.channel.send({ embed: embed });
+		} else {
+			embed.setImage(`attachment://file.${extension}`);
+			return message.channel.send({ embed: embed, files: [{ attachment: file.buffer, name: `file.${extension}` }] })
+		}
 	}
 }

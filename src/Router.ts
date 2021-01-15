@@ -214,7 +214,7 @@ class APIService {
 
 		await this.files.save(file);
 		await this.cacheFile(id, fileBuffer);
-		this.app.log.info(`Cached file ${id.split(".")[0]}`);
+		logger.info(`Cached file ${id.split(".")[0]}`);
 
 		reply.header("Content-Type", "application/json");
 
