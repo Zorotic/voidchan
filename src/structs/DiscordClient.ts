@@ -17,7 +17,13 @@ export class Client extends AkairoClient {
 
 	constructor(public router: APIService) {
 		super({
-			ownerID: process.env.DISCORD_OWNER_ID
+			ownerID: process.env.DISCORD_OWNER_ID,
+			presence: {
+				activity: {
+					name: process.env.HOSTNAME,
+					type: "WATCHING"
+				}
+			}
 		}, {
 			messageCacheMaxSize: 0,
 			ws: {
