@@ -18,6 +18,6 @@ export class FileEntry {
 	@Column({ default: 0 })
 	views: number;
 
-	@Column()
+	@Column({ nullable: true })
 	uploadedBy: string;
 }

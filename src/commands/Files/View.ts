@@ -22,7 +22,7 @@ export default class PingCommand extends Command {
 	public async exec(message: Message, args: any) {
 		const file = await this.client.router.files.findOne({ id: args.id });
 
-		if (!file) return message.util.send("I was unable to find what file you are looking for.");
+		if (!file) return message.util.send("I was unable to find what file you are looking for.", { replyTo: message.id });
 
 		const extension = mime.getExtension(file.mimetype);
 		const embed = new MessageEmbed()
@@ -33,10 +33,10 @@ export default class PingCommand extends Command {
 
 		if (extension === "txt") {
 			embed.setDescription(`You can view the file via the attached link.\nhttp://${process.env.HOSTNAME}/u/${file.id}`);
-			return message.channel.send({ embed: embed });
+			return message.channel.send({ embed: embed, replyTo: message.id });
 		} else {
 			embed.setImage(`attachment://file.${extension}`);
-			return message.channel.send({ embed: embed, files: [{ attachment: file.buffer, name: `file.${extension}` }] })
+			return message.channel.send({ embed: embed, files: [{ attachment: file.buffer, name: `file.${extension}` }], replyTo: message.id })
 		}
 	}
 }

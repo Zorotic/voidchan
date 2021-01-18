@@ -38,7 +38,7 @@ export default class EvalCommand extends Command {
 		const code = args.code as string;
 		const doReply = (val: string | Error) => {
 			if (val instanceof Error) {
-				message.util.send(`Callback error: \`${val}\``);
+				message.util.send(`Callback error: \`${val}\``, { replyTo: message.id });
 			} else {
 				const result = this._result(val, process.hrtime(this.hrStart));
 				for (const res of result) message.util.send(res);
@@ -51,14 +51,14 @@ export default class EvalCommand extends Command {
 			this.lastResult = eval(code);
 			hrDiff = process.hrtime(hrStart);
 		} catch (error) {
-			return message.util.send(`Error while evaluating: \`${error}\``);
+			return message.util.send(`Error while evaluating: \`${error}\``, { replyTo: message.id });
 		}
 
 		this.hrStart = process.hrtime();
 		const result = this._result(this.lastResult, hrDiff, code);
 		// @ts-ignore
-		if (Array.isArray(result)) return result.map(async res => message.util.send(res));
-		return message.util.send(result);
+		if (Array.isArray(result)) return result.map(async res => message.util.send(res, { replyTo: message.id }));
+		return message.util.send(result, { replyTo: message.id });
 	}
 
 	private _result(result: string, hrDiff: [number, number], input: string | null = null) {
