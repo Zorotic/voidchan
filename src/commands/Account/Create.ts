@@ -3,12 +3,13 @@ import { Message } from "discord.js";
 
 export default class PingCommand extends Command {
 	constructor() {
-		super("ping", {
-			aliases: ["ping"]
+		super("create-account", {
+			aliases: ["create"],
+
 		});
 	}
 
 	public exec(message: Message) {
-		return message.util.send(`Pong! \`${this.client.ws.ping}ms\``, { replyTo: message.id });
+		return message.channel.send("test", { replyTo: message.id });
 	}
 }
