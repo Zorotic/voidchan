@@ -4,3 +4,7 @@
 Join our support & community server: https://discord.gg/fw7PygjT4Q
 
 Created by Zorotic.
+
+
+## Setup
+Basic setup requires that you have a postgres and a redis server running on the same server as VoidChan with the default configuration on both.
