@@ -7,7 +7,6 @@ import * as mime from 'mime';
 export default class PingCommand extends Command {
 	constructor() {
 		super('view', {
-			ownerOnly: true,
 			aliases: ['view'],
 			args: [
 				{
@@ -20,8 +19,10 @@ export default class PingCommand extends Command {
 	}
 
 	public async exec(message: Message, args: any) {
-		const file = await this.client.router.files.findOne({ id: args.id });
-
+		const account = await this.client.router.accounts.findOne({ user: message.author.id });
+		if (!account) return message.util.send("You don't have an account! To create one please do `!create`", { replyTo: message.id });
+		
+		const file = await this.client.router.files.findOne({ id: args.id, uploadedBy: account.id });
 		if (!file) return message.util.send("I was unable to find what file you are looking for.", { replyTo: message.id });
 
 		const extension = mime.getExtension(file.mimetype);

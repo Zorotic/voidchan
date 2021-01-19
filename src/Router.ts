@@ -11,7 +11,7 @@ import {
 	Repository 
 } from "typeorm";
 
-import { FileEntry, ShortenedURL } from "./entities";
+import { FileEntry, ShortenedURL, AccountEntry } from "./entities";
 import { FileUploadReply, ShortenedURLReply } from "./structs";
 import { randomString } from "./util/randomString";
 import { Logger } from "@ayanaware/logger";
@@ -25,6 +25,7 @@ class APIService {
 	public port: number;
 	public db: Connection;
 	public files: Repository<FileEntry>;
+	public accounts: Repository<AccountEntry>;
 	public urls: Repository<ShortenedURL>;
 	public redis: redis.Redis = new redis(); // TODO: Parse login information.
 
@@ -57,12 +58,14 @@ class APIService {
 				synchronize: true,
 				entities: [
 					FileEntry,
-					ShortenedURL
+					ShortenedURL,
+					AccountEntry
 				]
 			});
 		})().then(() => {
-			this.files = getRepository<FileEntry>(FileEntry);
-			this.urls = getRepository<ShortenedURL>(ShortenedURL);
+			this.files = getRepository(FileEntry);
+			this.urls = getRepository(ShortenedURL);
+			this.accounts = getRepository(AccountEntry);
 		});
 	}
 
@@ -191,7 +194,8 @@ class APIService {
 
 	/// This is untyped due to the mimetype support we need.
 	private async handleShareXUpload(req: any, reply: any) {
-		if (!req.headers.authorization || req.headers.authorization !== process.env.UPLOAD_SECRET) {
+		const account = await this.accounts.findOne({ id: req.headers.authorization });
+		if (!account) {
 			reply.status(401);
 			reply.header("Content-Type", "text/plain");
 			return "You are unable to access this endpoint.";
@@ -211,10 +215,11 @@ class APIService {
 		file.mimetype = data.mimetype;
 		file.uploadDate = new Date();
 		file.buffer = fileBuffer;
+		file.uploadedBy = account.id;
 
 		await this.files.save(file);
 		await this.cacheFile(id, fileBuffer);
-		logger.info(`Cached file ${id.split(".")[0]}`);
+		logger.info(`Cached file ${id.split(".")[0]} uploaded by user ${account.user}`);
 
 		reply.header("Content-Type", "application/json");
 
