@@ -1,5 +1,7 @@
-import { cpuUsage } from "process";
-import { Entity, PrimaryColumn, Column } from "typeorm";
+import { Entity, PrimaryColumn, Column, JoinColumn, OneToOne } from "typeorm";
+
+
+type AccountId = string;
 
 @Entity()
 export class FileEntry {
@@ -18,6 +20,6 @@ export class FileEntry {
 	@Column({ default: 0 })
 	views: number;
 
-	@Column({ nullable: true })
-	uploadedBy: string;
+	@Column()
+	uploadedBy: AccountId;
 }
