@@ -16,6 +16,12 @@ app.addHook("onRequest", (req, res, next) => {
 	next();
 });
 
+app.register(require("point-of-view"), {
+	engine: {
+		ejs: require("ejs")
+	}
+})
+
 const api = new APIService(app, {
 	port: parseInt(process.env.PORT)
 });

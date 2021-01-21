@@ -3,7 +3,9 @@ import { Message, MessageEmbed } from "discord.js";
 
 import * as crypto from "crypto";
 import { AccountEntry } from "../../entities";
+import Logger from "@ayanaware/logger";
 
+const logger = Logger.get();
 export default class PingCommand extends Command {
 	constructor() {
 		super("create-account", {
@@ -47,6 +49,8 @@ export default class PingCommand extends Command {
 		} catch (e) {
 			return message.util.send("I was unable to send you a DM! Please make sure your DMs are open and try again!", { replyTo: message.id });
 		}
+
+		logger.info(`${message.author.tag} created an account.`);
 
 		await this.client.router.accounts.save(newAccount);
 		await message.util.send("Account has been created successfully!");

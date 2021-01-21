@@ -43,6 +43,7 @@ class APIService {
 
 		/// For uploaded content.
 		this.app.get("/u/:id", this.handleGetFile.bind(this));
+		this.app.get("/view/:id", this.handleFullGetFile.bind(this));
 
 		/// For shortened URLs.
 		this.app.get("/:id", this.handleShortenedURL.bind(this));
@@ -191,6 +192,29 @@ class APIService {
 		reply.send(file);
 	}
 
+	private async handleFullGetFile(req: Request, reply: any) {
+		const id = (req.params as any).id;
+		const file = await this.files.findOne({ id: id.split(".")[0] })
+
+		if (!file) {
+			reply.header("Content-Type", "text/plain");
+			reply.status(404);
+			return "Image not found!";
+		}
+
+		const account = await this.accounts.findOne({ id: file.uploadedBy });
+
+		reply.view("../views/View.ejs", { 
+			image: `https://${process.env.HOSTNAME}/u/${id}`,
+			url: `https://${process.env.HOSTNAME}/view/${id}`,
+			title: account.embed_title,
+			color: account.embed_color,
+			username: account.embed_username,
+			fileName: id,
+			host: process.env.HOSTNAME
+		});
+	}
+
 
 	/// This is untyped due to the mimetype support we need.
 	private async handleShareXUpload(req: any, reply: any) {
@@ -228,7 +252,8 @@ class APIService {
 			files: [
 				{
 					name: `${token}.${mimetype}`,
-					url: `${req.protocol}://${req.hostname}/u/${id}`
+					url: `${req.protocol}://${req.hostname}/view/${id}`
+		
 				}
 		]} as FileUploadReply;
 	}
@@ -239,7 +264,7 @@ class APIService {
 			const fetchedImage = await this.files.findOne({ id: id.split(".")[0] }) as FileEntry;
 
 			await this.redis.set(id, fetchedImage.buffer, "EX", 3600);
-			logger.info(`Cached file ${id.split(".")[0]}`);
+			logger.info(`Cached file ${id.split(".")[0]} uploaded by ${fetchedImage.uploadedBy}`);
 
 			return fetchedImage.buffer;
 		}
