@@ -43,7 +43,7 @@ class APIService {
 
 		/// For uploaded content.
 		this.app.get("/u/:id", this.handleGetFile.bind(this));
-		this.app.get("/view/:id", this.handleFullGetFile.bind(this));
+		this.app.get("/v/:id", this.handleFullGetFile.bind(this));
 
 		/// For shortened URLs.
 		this.app.get("/:id", this.handleShortenedURL.bind(this));
@@ -252,7 +252,7 @@ class APIService {
 			files: [
 				{
 					name: `${token}.${mimetype}`,
-					url: `${req.protocol}://${req.hostname}/${req.headers.embedded && req.headers.embedded !== "false" ? "view" : "u"}/${id}`
+					url: `${req.protocol}://${req.hostname}/${req.headers.embedded && req.headers.embedded !== "false" ? "v" : "u"}/${id}`
 		
 				}
 		]} as FileUploadReply;
