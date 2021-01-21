@@ -5,7 +5,6 @@ import { stripIndents } from "common-tags";
 export default class PingCommand extends Command {
 	constructor() {
 		super("settings-account", {
-			ownerOnly: true,
 			aliases: ["settings", "preferences"],
 		});
 	}
