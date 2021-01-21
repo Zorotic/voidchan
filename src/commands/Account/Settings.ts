@@ -18,7 +18,7 @@ export default class PingCommand extends Command {
 
 		const valueArg = yield {
 			type: (message: Message, value: string): string => {
-				if (keyArg === "color" && !/^#[0-9a-f]{3,6}$/i.test(value)) return null;
+				if (keyArg === "color" && !/^#[0-9a-f]{3,6}$/i.test(value) || !value) return null;
 				return message.content.split(" ").slice(2).join(" ") || "default";
 			},
 			prompt: {
