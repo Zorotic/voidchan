@@ -10,4 +10,13 @@ export class AccountEntry {
 
 	@Column({ type: "timestamp" })
 	createdAt: Date;
+
+	@Column({ default: "Person" })
+	embed_username: string
+
+	@Column({ default: "#ff2a6d" })
+	embed_color: string;
+
+	@Column({ default: "Voidchan Uploads" })
+	embed_title: string;
 }

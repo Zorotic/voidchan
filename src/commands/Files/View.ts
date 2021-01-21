@@ -23,7 +23,7 @@ export default class PingCommand extends Command {
 		if (!account) return message.util.send("You don't have an account! To create one please do `!create`", { replyTo: message.id });
 		
 		const file = await this.client.router.files.findOne({ id: args.id, uploadedBy: account.id });
-		if (!file) return message.util.send("I was unable to find what file you are looking for.", { replyTo: message.id });
+		if (!file) return message.util.send("I was unable to find the file you're looking for.", { replyTo: message.id });
 
 		const extension = mime.getExtension(file.mimetype);
 		const embed = new MessageEmbed()
