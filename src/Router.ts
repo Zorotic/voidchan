@@ -252,7 +252,7 @@ class APIService {
 			files: [
 				{
 					name: `${token}.${mimetype}`,
-					url: `${req.protocol}://${req.hostname}/${req.headers.embedded && req.headers.embedded !== "false" ? "/view" : "/u"}/${id}`
+					url: `${req.protocol}://${req.hostname}/${req.headers.embedded && req.headers.embedded !== "false" ? "view" : "u"}/${id}`
 		
 				}
 		]} as FileUploadReply;
