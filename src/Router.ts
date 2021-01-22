@@ -15,6 +15,7 @@ import { FileEntry, ShortenedURL, AccountEntry } from "./entities";
 import { FileUploadReply, ShortenedURLReply } from "./structs";
 import { randomString } from "./util/randomString";
 import { Logger } from "@ayanaware/logger";
+import { readFileSync } from "fs";
 
 import * as mime from "mime";
 import * as redis from "ioredis";
@@ -47,6 +48,11 @@ class APIService {
 
 		/// For shortened URLs.
 		this.app.get("/:id", this.handleShortenedURL.bind(this));
+
+		this.app.get("/favicon.ico", (req: any, res: Reply) => {
+			res.header("Content-Type", "image/x-icon")
+			res.send(readFileSync("../assets/favicon.ico"));
+		});
 
 		(async () => {
 			this.db = await createConnection({
