@@ -11,6 +11,7 @@
     "@types/ioredis": "^4.17.10",
     "@types/mime": "^2.0.3",
     "@types/node": "^14.14.16",
+    "@types/tlds": "^1.199.0",
     "common-tags": "^1.8.0",
     "discord-akairo": "^8.1.0",
     "discord.js": "discordjs/discord.js",
@@ -19,11 +20,13 @@
     "fastify": "^3.9.2",
     "fastify-multipart": "^3.3.1",
     "ioredis": "^4.19.4",
+    "ip-regex": "^4.3.0",
     "middie": "^5.2.0",
     "mime": "^2.4.7",
     "pg": "^8.5.1",
     "point-of-view": "^4.8.0",
     "reflect-metadata": "^0.1.13",
+    "tlds": "^1.216.0",
     "typeorm": "^0.2.29"
   },
   "devDependencies": {

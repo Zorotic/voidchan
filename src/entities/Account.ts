@@ -12,11 +12,14 @@ export class AccountEntry {
 	createdAt: Date;
 
 	@Column({ default: "Person" })
-	embed_username: string
+	embed_username: string;
 
 	@Column({ default: "#ff2a6d" })
 	embed_color: string;
 
 	@Column({ default: "Voidchan Uploads" })
 	embed_title: string;
+
+	@Column({ array: true, type: "text", default: null })
+	registeredDomains: string[];
 }
